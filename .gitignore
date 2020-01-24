@@ -16,3 +16,6 @@
 #
 # Vim
 *.swp
+
+# secrets:
+set_config.sh

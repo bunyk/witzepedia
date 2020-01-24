@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -49,7 +50,7 @@ func oauthGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := getUserDataFromGoogle(r.FormValue("code"))
+	user, err := getUserDataFromGoogle(r.FormValue("code"))
 	if err != nil {
 		log.Println(err.Error())
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -59,12 +60,17 @@ func oauthGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	// GetOrCreate User in your db.
 	// Redirect or response with a token.
 	// More code .....
-	fmt.Fprintf(w, "UserInfo: %s\n", data)
+
+	fmt.Fprintf(w, "UserInfo: %s\n", user.Email)
 }
 
 const oauthGoogleUrlAPI = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
 
-func getUserDataFromGoogle(code string) ([]byte, error) {
+type userData struct {
+	Email string
+}
+
+func getUserDataFromGoogle(code string) (*userData, error) {
 	// Use code to get token and get user info from Google.
 
 	cfg := config.LoadConfig()
@@ -81,5 +87,7 @@ func getUserDataFromGoogle(code string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed read response: %s", err.Error())
 	}
-	return contents, nil
+	user := &userData{}
+	err = json.Unmarshal(contents, user)
+	return user, err
 }

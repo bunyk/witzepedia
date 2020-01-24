@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -17,10 +18,12 @@ var config *Config
 
 func LoadConfig() *Config {
 	if config == nil {
+		port := env("APP_PORT", "8001")
+		domain := env("APP_DOMAIN", "witzepedia.org")
 		config = &Config{
-			Addr: env("APP_PORT", ":8001"),
+			Addr: ":" + port,
 			OAuth: oauth2.Config{
-				RedirectURL:  "http://localhost:8000/auth/google/callback",
+				RedirectURL:  fmt.Sprintf("http://%s:%s/auth/google/callback", domain, port),
 				ClientID:     env("GOOGLE_OAUTH_CLIENT_ID", "id"),
 				ClientSecret: env("GOOGLE_OAUTH_CLIENT_SECRET", "secret"),
 				Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},

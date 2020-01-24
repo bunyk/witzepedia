@@ -10,7 +10,7 @@ import (
 func NewServer(cfg *config.Config) *http.Server {
 	mux := http.NewServeMux()
 	// Root
-	mux.Handle("/", http.FileServer(http.Dir("templates/")))
+	mux.Handle("/", http.FileServer(http.Dir("static/")))
 
 	auth.MountHandlers(mux)
 
